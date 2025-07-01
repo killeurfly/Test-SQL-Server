@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ajout étudiant AJAX</title>
+</head>
+<body>
+  <h1>Ajouter un étudiant (AJAX)</h1>
+  <form id="studentForm">
+    <input type="text" name="name" id="name" placeholder="Nom" required />
+    <input type="email" name="email" id="email" placeholder="Email" required />
+    <input type="text" name="grade" id="grade" placeholder="Note (A/B...)" maxlength="1" required />
+    <button type="submit">Ajouter</button>
+  </form>
+
+  <div id="message"></div>
+
+  <h2>Liste des étudiants</h2>
+  <table border="1" cellpadding="6" id="studentsTable">
+    <thead>
+      <tr>
+        <th>ID</th><th>Nom</th><th>Email</th><th>Note</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById('studentForm');
+    const messageDiv = document.getElementById('message');
+    const tbody = document.querySelector('#studentsTable tbody');
+
+    function renderStudents(students) {
+      tbody.innerHTML = '';
+      students.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${s.ID}</td>
+          <td>${s.NAME}</td>
+          <td>${s.EMAIL}</td>
+          <td>${s.GRADE}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function fetchStudents() {
+      // Optionnel : charge la liste au démarrage (à créer côté backend si besoin)
+      // Ici on récupère la liste par AJAX pour affichage initial
+      const res = await fetch('add_ajax.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name:'', email:'', grade:''}) // envoyer vide déclenche juste liste
+      });
+      const data = await res.json();
+      if (data.success) renderStudents(data.students);
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const grade = form.grade.value.trim();
+
+      if (!name || !email || !grade) {
+        messageDiv.textContent = 'Tous les champs sont obligatoires';
+        return;
+      }
+
+      const res = await fetch('add_ajax.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, email, grade})
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        messageDiv.style.color = 'green';
+        messageDiv.textContent = data.message;
+        renderStudents(data.students);
+        form.reset();
+      } else {
+        messageDiv.style.color = 'red';
+        messageDiv.textContent = data.message;
+      }
+    });
+
+    // Charge la liste au chargement de la page
+    fetchStudents();
+  </script>
+</body>
+</html>

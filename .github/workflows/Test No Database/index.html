@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulaire AJAX - fetch + PHP</title>
+</head>
+<body>
+  <h1>Envoyer un nom via fetch()</h1>
+
+  <form id="studentForm">
+    <input type="text" name="name" id="name" placeholder="Prenom"  />
+    <input type="text" name="famillyname" id="famillyname" placeholder="Nom de famille"  />
+    <button type="submit">Envoyer</button>
+  </form>
+
+  <div id="resultat" style="margin-top: 1em; font-weight: bold;"></div>
+
+  <script>
+    document.getElementById('studentForm').addEventListener('submit', async function(e) {
+      e.preventDefault(); // Empêche le rechargement
+
+      const name = document.getElementById('name').value;
+      const famillyname = document.getElementById('famillyname').value;
+
+      // Envoi de la requête POST JSON vers traitement.php
+      const response = await fetch('traitement.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name, famillyname:famillyname })
+      });
+
+      const result = await response.json(); // Lecture de la réponse JSON
+
+      // Affichage du message renvoyé par PHP
+      document.getElementById('resultat').textContent = result.message;
+    });
+  </script>
+</body>
+</html>
