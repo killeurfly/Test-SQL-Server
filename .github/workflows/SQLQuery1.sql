@@ -8,6 +8,6 @@ GRADE VARCHAR(2)
 
 );
 
-INSERT INTO students VALUES ('Pablo', 'Pablo@gmail.com','A');
+INSERT INTO students VALUES ('Jhon', 'Jhon@gmail.com','A');
 
 SELECT * FROM students
